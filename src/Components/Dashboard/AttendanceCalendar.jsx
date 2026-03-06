@@ -4,10 +4,10 @@ import axios from "axios";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-export default function AttendanceCalendar() {
+export default function AttendanceCalendar({ onAttendanceChange }) {
 
   const API = import.meta.env.VITE_API_BASE_URL;
-
+  
   const [attendance, setAttendance] = useState({});
   const [stats, setStats] = useState({
     present: 0,
@@ -91,6 +91,9 @@ export default function AttendanceCalendar() {
       }));
 
       fetchMonthlyAttendance();
+      if(onAttendanceChange){
+      onAttendanceChange();
+    }
 
     } catch (error) {
       console.log(error);
@@ -119,7 +122,9 @@ export default function AttendanceCalendar() {
       }));
 
       fetchMonthlyAttendance();
-
+       if(onAttendanceChange){
+      onAttendanceChange();
+    }
     } catch (error) {
       console.log(error);
     }

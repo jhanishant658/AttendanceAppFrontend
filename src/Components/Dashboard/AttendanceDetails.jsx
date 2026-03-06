@@ -169,7 +169,7 @@ console.log(localStorage.getItem("userId"));
 
         {/* Desktop Calendar */}
         <div className="hidden lg:block w-72 p-4 mt-[20vh]">
-          <AttendanceCalendar/>
+         <AttendanceCalendar onAttendanceChange={fetchAttendanceData}/>
         </div>
 
       </div>
@@ -190,7 +190,7 @@ console.log(localStorage.getItem("userId"));
               <CloseIcon/>
             </button>
 
-            <AttendanceCalendar/>
+           <AttendanceCalendar onAttendanceChange={fetchAttendanceData}/>
 
           </div>
 

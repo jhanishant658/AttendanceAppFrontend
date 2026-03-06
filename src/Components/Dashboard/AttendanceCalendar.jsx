@@ -11,10 +11,13 @@ export default function AttendanceCalendar() {
   const [attendance, setAttendance] = useState({});
   const [stats, setStats] = useState({
     present: 0,
-    absent: 0
+    absent: 0,
+    holiday: 0
   });
 
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const today = new Date();
 
@@ -46,6 +49,7 @@ export default function AttendanceCalendar() {
 
       let present = 0;
       let absent = 0;
+      let holiday = 0;
 
       res.data.attendances.forEach(a => {
 
@@ -53,14 +57,67 @@ export default function AttendanceCalendar() {
 
         if (a.status === "present") present++;
         if (a.status === "absent") absent++;
+        if (a.status === "holiday") holiday++;
 
       });
 
       setAttendance(map);
-      setStats({ present, absent });
+      setStats({ present, absent, holiday });
 
     } catch (error) {
+
+      console.log("Monthly API error", error);
+
+    }
+
+  };
+
+  const MarkPastAttendance = async (status, date) => {
+
+    try {
+
+      const res = await axios.post(
+        `${API}/api/attendance/addOldAttendance`,
+        {
+          userId: localStorage.getItem("userId"),
+          status,
+          date
+        }
+      );
+
+      alert(res.data);
+
+      fetchMonthlyAttendance();
+
+    } catch (error) {
+
       console.log(error);
+
+    }
+
+  };
+
+  const updatePastAttendance = async (status, date) => {
+
+    try {
+
+      const res = await axios.patch(
+        `${API}/api/attendance/update`,
+        {
+          userId: localStorage.getItem("userId"),
+          status,
+          date
+        }
+      );
+
+      alert(res.data);
+
+      fetchMonthlyAttendance();
+
+    } catch (error) {
+
+      console.log(error);
+
     }
 
   };
@@ -69,10 +126,11 @@ export default function AttendanceCalendar() {
 
     const newDate = new Date(currentDate);
     newDate.setMonth(month + direction);
-
     setCurrentDate(newDate);
 
   };
+
+  const isFutureDate = (date) => new Date(date) > today;
 
   const getColor = (status) => {
 
@@ -87,10 +145,43 @@ export default function AttendanceCalendar() {
       case "holiday":
         return "bg-yellow-400";
 
+      case "weekend":
+        return "bg-blue-300";
+
+      case "not-marked":
+        return "bg-purple-400";
+
       default:
-        return "bg-gray-400";
+        return "bg-gray-300";
 
     }
+
+  };
+
+  const handleDayClick = (date, status, isWeekend, future) => {
+
+    if (isWeekend || future) return;
+
+    setSelectedDate(date);
+    setSelectedStatus(status === "not-marked" ? "" : status);
+
+  };
+
+  const handleSubmit = () => {
+
+    if (!selectedDate) return;
+
+    if (!attendance[selectedDate]) {
+
+      MarkPastAttendance(selectedStatus, selectedDate);
+
+    } else {
+
+      updatePastAttendance(selectedStatus, selectedDate);
+
+    }
+
+    setSelectedDate(null);
 
   };
 
@@ -107,14 +198,31 @@ export default function AttendanceCalendar() {
       const date =
         `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
 
-      const status = attendance[date] || "default";
+      const day = new Date(date).getDay();
+      const isWeekend = day === 0 || day === 6;
+
+      const future = isFutureDate(date);
+
+      const status =
+        future ? "future"
+        : isWeekend ? "weekend"
+        : attendance[date] || "not-marked";
+
+      const isToday =
+        today.getFullYear() === year &&
+        today.getMonth() === month &&
+        today.getDate() === i;
 
       days.push(
 
         <div key={i} className="flex justify-center">
 
           <div
-            className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full text-white text-xs sm:text-sm ${getColor(status)}`}
+            onClick={() => handleDayClick(date, status, isWeekend, future)}
+            className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs
+            ${future ? "bg-gray-400 cursor-not-allowed" : getColor(status)}
+            ${isWeekend ? "cursor-not-allowed" : "cursor-pointer"}
+            ${isToday ? "ring-2 ring-indigo-600" : ""}`}
           >
 
             {i}
@@ -131,78 +239,63 @@ export default function AttendanceCalendar() {
 
   };
 
+  const monthName = currentDate.toLocaleString("default", { month: "long" });
+
+  const daysHeader = ["S", "M", "T", "W", "T", "F", "S"];
+
   const total = stats.present + stats.absent;
 
   const percentage =
     total === 0 ? 0 : ((stats.present / total) * 100).toFixed(1);
 
-  const monthName = currentDate.toLocaleString("default", {
-    month: "long"
-  });
-
   return (
 
-    <div className="bg-white p-4 rounded-xl shadow w-full">
+    <div className="bg-white p-5 rounded-xl shadow max-w-md mx-auto">
 
       {/* Stats */}
 
-      <div className="grid grid-cols-3 gap-2 mb-4 text-center">
+      <div className="grid grid-cols-3 gap-3 mb-4 text-center">
 
-        <div className="bg-green-100 p-2 rounded-lg">
-
-          <p className="text-xs">Present</p>
-
-          <p className="font-bold text-green-700">
-            {stats.present}
-          </p>
-
+        <div className="bg-green-100 p-2 rounded">
+          <p className="text-xs text-gray-600">Present</p>
+          <p className="font-bold text-green-700">{stats.present}</p>
         </div>
 
-        <div className="bg-red-100 p-2 rounded-lg">
-
-          <p className="text-xs">Absent</p>
-
-          <p className="font-bold text-red-700">
-            {stats.absent}
-          </p>
-
+        <div className="bg-red-100 p-2 rounded">
+          <p className="text-xs text-gray-600">Absent</p>
+          <p className="font-bold text-red-700">{stats.absent}</p>
         </div>
 
-        <div className="bg-blue-100 p-2 rounded-lg">
-
-          <p className="text-xs">Attendance %</p>
-
-          <p className="font-bold text-blue-700">
-            {percentage}%
-          </p>
-
+        <div className="bg-blue-100 p-2 rounded">
+          <p className="text-xs text-gray-600">Attendance %</p>
+          <p className="font-bold text-blue-700">{percentage}%</p>
         </div>
 
       </div>
 
-      {/* Month Navigation */}
+      {/* Month Header */}
 
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-center mb-4">
 
         <button onClick={() => changeMonth(-1)}>
-          <ArrowBackIosIcon fontSize="small"/>
+          <ArrowBackIosIcon fontSize="small" />
         </button>
 
-        <h2 className="font-semibold text-sm">
+        <h2 className="font-semibold">
           {monthName} {year}
         </h2>
 
         <button onClick={() => changeMonth(1)}>
-          <ArrowForwardIosIcon fontSize="small"/>
+          <ArrowForwardIosIcon fontSize="small" />
         </button>
 
       </div>
 
       {/* Days Header */}
 
-      <div className="grid grid-cols-7 text-xs text-center mb-1 text-gray-600">
+      <div className="grid grid-cols-7 text-xs text-center mb-2 text-gray-600">
 
-        {["S","M","T","W","T","F","S"].map((d,i)=>(
+        {daysHeader.map((d, i) => (
           <div key={i}>{d}</div>
         ))}
 
@@ -210,11 +303,43 @@ export default function AttendanceCalendar() {
 
       {/* Calendar */}
 
-      <div className="grid grid-cols-7 gap-1">
-
+      <div className="grid grid-cols-7 gap-2 mb-4">
         {renderDays()}
-
       </div>
+
+      {/* Click Form */}
+
+      {selectedDate && (
+
+        <div className="border rounded p-3 mt-3">
+
+          <p className="text-sm mb-2">Date: {selectedDate}</p>
+
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="border p-2 rounded w-full"
+          >
+
+            <option value="">Select Status</option>
+            <option value="present">Present</option>
+            <option value="absent">Absent</option>
+            <option value="holiday">Holiday</option>
+
+          </select>
+
+          <button
+            onClick={handleSubmit}
+            className="mt-2 bg-blue-600 text-white w-full py-1 rounded"
+          >
+
+            Submit
+
+          </button>
+
+        </div>
+
+      )}
 
     </div>
 

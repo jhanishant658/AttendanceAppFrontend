@@ -11,16 +11,17 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import PercentIcon from "@mui/icons-material/Percent";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import Navbar from "./NavBar";
 
 export default function AttendanceDetails() {
 
   const [attendanceData, setAttendanceData] = useState({
-    presentCount: 1,
-    abbsentCount: 1,
-    totalAttendance: 2,
-    attendancePercentage: 50,
-    daysRequiredFor75Percent: 2,
-    daysRequiredFor60Percent: 1,
+    presentCount: 0,
+    abbsentCount: 0,
+    totalAttendance: 0,
+    attendancePercentage: 0,
+    daysRequiredFor75Percent: 0,
+    daysRequiredFor60Percent: 0,
     daysWeCanBeAbsentFor75Percent: 0,
     daysWeCanBeAbsentFor60Percent: 0
   });
@@ -29,12 +30,17 @@ export default function AttendanceDetails() {
 
   const fetchAttendanceData = async () => {
     try {
-      const res = await axios.get(
-        "https://attendanceapp-c2gu.onrender.com/api/attendance/stats"
-      );
+     const res = await axios.post(
+  `${import.meta.env.VITE_API_BASE_URL}/api/attendance/summary`,
+  { 
+      userId: localStorage.getItem("userId") 
+  }
+);
+console.log(localStorage.getItem("userId"));
       setAttendanceData(res.data);
-    } catch {
-      console.log("Using default data");
+    } catch (error) {
+      
+      console.log(error);
     }
   };
 
@@ -43,7 +49,8 @@ export default function AttendanceDetails() {
   }, []);
 
   return (
-
+    <div>
+   <Navbar/>
     <div className="min-h-screen bg-slate-100 flex justify-center">
 
       <div className="flex w-full max-w-7xl">
@@ -97,9 +104,9 @@ export default function AttendanceDetails() {
 
             <div className="bg-white p-4 rounded-lg shadow text-center">
               <PercentIcon className="text-indigo-600 mx-auto mb-1"/>
-              %
+              Percentage
               <p className="text-xl font-bold text-indigo-600">
-                {attendanceData.attendancePercentage}
+                {attendanceData.attendancePercentage.toFixed(2)}
               </p>
             </div>
 
@@ -190,7 +197,7 @@ export default function AttendanceDetails() {
         </div>
 
       )}
-
+</div>
     </div>
 
   );

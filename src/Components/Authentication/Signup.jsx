@@ -36,7 +36,7 @@ export default function Signup() {
     try {
 
       const response = await axios.post(
-        "https://attendanceapp-c2gu.onrender.com/api/users/signup",
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/signup`,
         formData
       );
 

@@ -7,9 +7,15 @@ import LoginIcon from "@mui/icons-material/Login";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-import { Link } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Signin() {
+
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,18 +37,25 @@ export default function Signin() {
 
     e.preventDefault();
 
+    setLoading(true);
+
     try {
 
       const response = await axios.post(
-        "https://attendanceapp-c2gu.onrender.com/api/users/login",
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/login`,
         formData
       );
 
-      console.log(response.data);
+      localStorage.setItem("name", response.data.name);
+      localStorage.setItem("userId", response.data.id);
 
-      alert("Login Successful");
+      setLoading(false);
+
+      navigate("/dashboard");
 
     } catch (error) {
+
+      setLoading(false);
 
       alert("Invalid Credentials");
 
@@ -52,23 +65,37 @@ export default function Signin() {
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 px-4">
 
-      <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-xl w-full max-w-md">
+      {/* LOADING OVERLAY */}
 
-        {/* Icon */}
+      {loading && (
+
+        <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50">
+
+          <CircularProgress size={50} className="text-white"/>
+
+          <p className="text-white mt-4 text-center text-sm">
+
+            Please wait, first time may take a few seconds...
+
+          </p>
+
+        </div>
+
+      )}
+
+      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
 
         <div className="flex justify-center mb-4">
           <LoginIcon className="text-blue-600" style={{ fontSize: 42 }} />
         </div>
 
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
-          Sign In
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Welcome Back
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-
-          {/* Email */}
 
           <div className="flex items-center border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
 
@@ -78,15 +105,13 @@ export default function Signin() {
               type="email"
               name="email"
               placeholder="Email address"
-              className="w-full outline-none text-sm sm:text-base"
+              className="w-full outline-none"
               value={formData.email}
               onChange={handleChange}
               required
             />
 
           </div>
-
-          {/* Password */}
 
           <div className="flex items-center border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
 
@@ -96,7 +121,7 @@ export default function Signin() {
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
-              className="w-full outline-none text-sm sm:text-base"
+              className="w-full outline-none"
               value={formData.password}
               onChange={handleChange}
               required
@@ -105,14 +130,11 @@ export default function Signin() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-gray-500"
             >
               {showPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
             </button>
 
           </div>
-
-          {/* Login Button */}
 
           <button
             type="submit"
@@ -120,15 +142,13 @@ export default function Signin() {
           >
 
             <LoginIcon fontSize="small"/>
-            Login
+            Sign In
 
           </button>
 
         </form>
 
-        {/* Signup link */}
-
-        <p className="text-center mt-5 text-sm">
+        <p className="text-center mt-6 text-sm">
 
           Don't have an account?
 

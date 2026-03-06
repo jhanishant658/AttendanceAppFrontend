@@ -4,6 +4,7 @@ import Signup from './Components/Authentication/Signup';
 import Signin from './Components/Authentication/Signin';
 import Home from './Components/Dashboard/Home';
 import AttendanceDetails from './Components/Dashboard/AttendanceDetails';
+import HomePage from './Components/Dashboard/HomePage';
 
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
     <BrowserRouter>
 
       <Routes>
-
+       <Route path = "/dashboard" element ={<HomePage/>}/>
         <Route path="/signup" element={<Signup/>} />
         <Route path='/signin' element={<Signin/>} />
         <Route path='/' element= {<Home/>} />

@@ -1,40 +1,140 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 export default function AttendanceCalendar() {
 
+  const API = import.meta.env.VITE_API_BASE_URL;
+
   const [attendance, setAttendance] = useState({});
+  const [stats, setStats] = useState({
+    present: 0,
+    absent: 0,
+    holiday: 0
+  });
+
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
 
-  const dummyData = {
-    "2026-03-01": "present",
-    "2026-03-02": "absent",
-    "2026-03-05": "holiday"
-  };
-
-  useEffect(() => {
-    setAttendance(dummyData);
-  }, []);
+  const today = new Date();
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  const today = new Date();
+  const monthString = `${year}-${String(month + 1).padStart(2, "0")}`;
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-
   const firstDayOfMonth = new Date(year, month, 1).getDay();
+
+  useEffect(() => {
+    fetchMonthlyAttendance();
+  }, [currentDate]);
+
+  const fetchMonthlyAttendance = async () => {
+
+    try {
+
+      const res = await axios.post(
+        `${API}/api/attendance/byMonth`,
+        {
+          userId: localStorage.getItem("userId"),
+          month: monthString
+        }
+      );
+
+      const map = {};
+
+      let present = 0;
+      let absent = 0;
+      let holiday = 0;
+
+      res.data.attendances.forEach(a => {
+
+        map[a.date] = a.status;
+
+        if (a.status === "present") present++;
+        if (a.status === "absent") absent++;
+        if (a.status === "holiday") holiday++;
+
+      });
+
+      setAttendance(map);
+      setStats({ present, absent, holiday });
+
+    } catch (error) {
+      console.log("Monthly API error", error);
+    }
+
+  };
+
+  const MarkPastAttendance = async (status, date) => {
+
+    try {
+
+      const res = await axios.post(
+        `${API}/api/attendance/addOldAttendance`,
+        {
+          userId: localStorage.getItem("userId"),
+          status,
+          date
+        }
+      );
+
+      alert(res.data);
+
+      setAttendance(prev => ({
+        ...prev,
+        [date]: status
+      }));
+
+      fetchMonthlyAttendance();
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  };
+
+  const updatePastAttendance = async (status, date) => {
+
+    try {
+
+      const res = await axios.patch(
+        `${API}/api/attendance/update`,
+        {
+          userId: localStorage.getItem("userId"),
+          status,
+          date
+        }
+      );
+
+      alert(res.data);
+
+      setAttendance(prev => ({
+        ...prev,
+        [date]: status
+      }));
+
+      fetchMonthlyAttendance();
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  };
 
   const changeMonth = (direction) => {
 
     const newDate = new Date(currentDate);
     newDate.setMonth(month + direction);
-
     setCurrentDate(newDate);
 
   };
+
+  const isFutureDate = (date) => new Date(date) > today;
 
   const getColor = (status) => {
 
@@ -52,6 +152,9 @@ export default function AttendanceCalendar() {
       case "weekend":
         return "bg-blue-300";
 
+      case "not-marked":
+        return "bg-purple-400";
+
       default:
         return "bg-gray-300";
 
@@ -59,25 +162,49 @@ export default function AttendanceCalendar() {
 
   };
 
+  const handleDayClick = (date, status, isWeekend, future) => {
+
+    if (isWeekend || future) return;
+
+    setSelectedDate(date);
+    setSelectedStatus(status === "not-marked" ? "" : status);
+
+  };
+
+  const handleSubmit = () => {
+
+    if (!selectedDate) return;
+
+    if (!attendance[selectedDate]) {
+      MarkPastAttendance(selectedStatus, selectedDate);
+    } else {
+      updatePastAttendance(selectedStatus, selectedDate);
+    }
+
+    setSelectedDate(null);
+
+  };
+
   const renderDays = () => {
 
     const days = [];
 
-    // empty spaces before month start
     for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(<div key={"empty"+i}></div>);
+      days.push(<div key={"empty" + i}></div>);
     }
 
     for (let i = 1; i <= daysInMonth; i++) {
 
-      const date = `${year}-${String(month+1).padStart(2,"0")}-${String(i).padStart(2,"0")}`;
+      const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
 
       const day = new Date(date).getDay();
-
       const isWeekend = day === 0 || day === 6;
 
-      const status = isWeekend
-        ? "weekend"
+      const future = isFutureDate(date);
+
+      const status =
+        future ? "future"
+        : isWeekend ? "weekend"
         : attendance[date] || "not-marked";
 
       const isToday =
@@ -90,15 +217,15 @@ export default function AttendanceCalendar() {
         <div key={i} className="flex justify-center">
 
           <div
-            className={`
-              w-9 h-9 rounded-full flex items-center justify-center
-              text-white text-xs
-              ${getColor(status)}
-              ${isWeekend ? "cursor-not-allowed" : "cursor-pointer"}
-              ${isToday ? "ring-2 ring-indigo-600" : ""}
-            `}
+            onClick={() => handleDayClick(date, status, isWeekend, future)}
+            className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs
+            ${future ? "bg-gray-400 cursor-not-allowed" : getColor(status)}
+            ${isWeekend ? "cursor-not-allowed" : "cursor-pointer"}
+            ${isToday ? "ring-2 ring-indigo-600" : ""}`}
           >
+
             {i}
+
           </div>
 
         </div>
@@ -111,81 +238,70 @@ export default function AttendanceCalendar() {
 
   };
 
-  const monthName = currentDate.toLocaleString("default", {
-    month: "long"
-  });
+  const monthName = currentDate.toLocaleString("default", { month: "long" });
 
-  const daysHeader = ["S","M","T","W","T","F","S"];
+  const daysHeader = ["S", "M", "T", "W", "T", "F", "S"];
+
+  const total = stats.present + stats.absent;
+  const percentage = total === 0 ? 0 : ((stats.present / total) * 100).toFixed(1);
 
   return (
 
-    <div className="bg-white p-4 rounded-xl shadow">
+    <div className="bg-white p-5 rounded-xl shadow max-w-md mx-auto">
 
-      {/* Month Navigation */}
+      {/* Stats */}
+
+      <div className="grid grid-cols-3 gap-3 mb-4 text-center">
+
+        <div className="bg-green-100 p-2 rounded">
+          <p className="text-xs text-gray-600">Present</p>
+          <p className="font-bold text-green-700">{stats.present}</p>
+        </div>
+
+        <div className="bg-red-100 p-2 rounded">
+          <p className="text-xs text-gray-600">Absent</p>
+          <p className="font-bold text-red-700">{stats.absent}</p>
+        </div>
+
+        <div className="bg-blue-100 p-2 rounded">
+          <p className="text-xs text-gray-600">Attendance %</p>
+          <p className="font-bold text-blue-700">{percentage}%</p>
+        </div>
+
+      </div>
+
+      {/* Month Header */}
 
       <div className="flex justify-between items-center mb-4">
 
-        <button onClick={()=>changeMonth(-1)}>
-          <ArrowBackIosIcon fontSize="small"/>
+        <button onClick={() => changeMonth(-1)}>
+          <ArrowBackIosIcon fontSize="small" />
         </button>
 
         <h2 className="font-semibold">
           {monthName} {year}
         </h2>
 
-        <button onClick={()=>changeMonth(1)}>
-          <ArrowForwardIosIcon fontSize="small"/>
+        <button onClick={() => changeMonth(1)}>
+          <ArrowForwardIosIcon fontSize="small" />
         </button>
 
       </div>
 
-      {/* Day headers */}
+      {/* Days Header */}
 
       <div className="grid grid-cols-7 text-xs text-center mb-2 text-gray-600">
 
-        {daysHeader.map((d,i)=>(
+        {daysHeader.map((d, i) => (
           <div key={i}>{d}</div>
         ))}
 
       </div>
 
-      {/* Calendar days */}
+      {/* Calendar */}
 
       <div className="grid grid-cols-7 gap-2 mb-4">
-
         {renderDays()}
-
-      </div>
-
-      {/* Legend */}
-
-      <div className="flex flex-wrap justify-center gap-3 text-xs">
-
-        <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-green-500"></span>
-          Present
-        </div>
-
-        <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-red-500"></span>
-          Absent
-        </div>
-
-        <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
-          Holiday
-        </div>
-
-        <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-blue-300"></span>
-          Weekend
-        </div>
-
-        <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-gray-300"></span>
-          Not Marked
-        </div>
-
       </div>
 
     </div>

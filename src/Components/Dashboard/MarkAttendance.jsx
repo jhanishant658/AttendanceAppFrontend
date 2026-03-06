@@ -1,27 +1,26 @@
 import React from "react";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-
+import axios from "axios";
 export default function MarkAttendance() {
 
   const markAttendance = async () => {
 
     try {
 
-      const response = await fetch(
-        "https://attendanceapp-c2gu.onrender.com/api/attendance/mark",
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/attendance/mark`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          }
+          userId: localStorage.getItem("userId"),
+          status: "present"
+
         }
       );
 
-      const data = await response.json();
+      const data = await response.data;
       console.log(data);
 
-      alert("Attendance Marked");
+      alert(data);
 
     } catch (error) {
       console.error(error);

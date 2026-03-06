@@ -1,15 +1,24 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Signup from './Components/Authentication/Signup';
+import Signin from './Components/Authentication/Signin';
+import Home from './Components/Dashboard/Home';
+import AttendanceDetails from './Components/Dashboard/AttendanceDetails';
+
 
 function App() {
   return (
-    <div className="h-screen flex items-center justify-center bg-black">
-      <h1 className="text-5xl text-yellow-400 font-bold">
-        Tailwind is working 🚀
-      </h1>
-    </div>
+    <BrowserRouter>
+
+      <Routes>
+
+        <Route path="/signup" element={<Signup/>} />
+        <Route path='/signin' element={<Signin/>} />
+        <Route path='/' element= {<Home/>} />
+        <Route path='/AttendanceDetail' element= {<AttendanceDetails/>} />
+      </Routes>
+
+    </BrowserRouter>
   );
 }
 

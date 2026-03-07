@@ -6,6 +6,7 @@ import PercentIcon from "@mui/icons-material/Percent";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 
 import Footer from "./Footer";
+import Navbar from "./NavBar";
 
 export default function AttendancePredictor() {
 
@@ -70,7 +71,7 @@ export default function AttendancePredictor() {
   return (
 
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 p-6">
-
+ <Navbar/>
       <div className="max-w-3xl mx-auto">
 
         {/* Title */}

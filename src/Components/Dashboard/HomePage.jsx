@@ -16,9 +16,9 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
 
       {/* Navbar */}
-      <Navbar/>
+      <Navbar />
 
-      {/* Container */}
+      {/* Main Container */}
       <div className="max-w-6xl mx-auto px-6 py-10">
 
         {/* Welcome Card */}
@@ -39,7 +39,7 @@ export default function HomePage() {
         {/* Mark Attendance */}
 
         <div className="mt-8">
-          <MarkAttendance/>
+          <MarkAttendance />
         </div>
 
 
@@ -51,14 +51,14 @@ export default function HomePage() {
 
         <div className="grid md:grid-cols-2 gap-6">
 
-          {/* Calendar */}
+          {/* Attendance Calendar */}
 
           <Link to="/AttendanceDetail">
 
             <div className="bg-white rounded-2xl p-7 shadow-md hover:shadow-xl transition hover:-translate-y-1 cursor-pointer">
 
               <CalendarMonthIcon
-                style={{fontSize:42}}
+                style={{ fontSize: 42 }}
                 className="text-blue-600"
               />
 
@@ -75,24 +75,29 @@ export default function HomePage() {
           </Link>
 
 
-          {/* Analytics */}
+          {/* Attendance Predictor */}
 
-          <div className="bg-white rounded-2xl p-7 shadow-md hover:shadow-xl transition hover:-translate-y-1">
+          <Link to="/AttendancePredictor">
 
-            <BarChartIcon
-              style={{fontSize:42}}
-              className="text-purple-600"
-            />
+            <div className="bg-white rounded-2xl p-7 shadow-md hover:shadow-xl transition hover:-translate-y-1 cursor-pointer">
 
-            <h3 className="text-lg font-semibold mt-3">
-              Attendance Analytics
-            </h3>
+              <BarChartIcon
+                style={{ fontSize: 42 }}
+                className="text-purple-600"
+              />
 
-            <p className="text-gray-500 mt-1">
-              Analyze your attendance percentage and stay above the required limit.
-            </p>
+              <h3 className="text-lg font-semibold mt-3">
+                Attendance Predictor
+              </h3>
 
-          </div>
+              <p className="text-gray-500 mt-1">
+                Predict your future attendance percentage or calculate the number
+                of days required to reach your target percentage.
+              </p>
+
+            </div>
+
+          </Link>
 
         </div>
 
@@ -112,13 +117,13 @@ export default function HomePage() {
           </p>
 
         </div>
-      
+
       </div>
 
       {/* Footer */}
-      <Footer/>
+      <Footer />
+
     </div>
 
   );
-
 }

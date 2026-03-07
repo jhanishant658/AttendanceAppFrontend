@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -42,7 +43,9 @@ export default function Navbar() {
             AttendEase
           </h1>
 
+
           {/* Desktop Menu */}
+
           <div className="hidden md:flex items-center gap-6">
 
             <NavLink
@@ -56,6 +59,7 @@ export default function Navbar() {
               Dashboard
             </NavLink>
 
+
             <NavLink
               to="/AttendanceDetail"
               className={({isActive}) =>
@@ -67,9 +71,25 @@ export default function Navbar() {
               Attendance
             </NavLink>
 
+
+            {/* NEW Predictor Link */}
+
+            <NavLink
+              to="/AttendancePredictor"
+              className={({isActive}) =>
+                `flex items-center gap-2 px-4 py-2 rounded-lg transition 
+                ${isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"}`
+              }
+            >
+              <QueryStatsIcon fontSize="small"/>
+              Predictor
+            </NavLink>
+
           </div>
 
-          {/* User Profile */}
+
+          {/* Profile */}
+
           <div className="relative hidden md:flex items-center">
 
             <button
@@ -98,7 +118,9 @@ export default function Navbar() {
 
           </div>
 
+
           {/* Mobile Menu Button */}
+
           <div className="md:hidden">
 
             <MenuIcon
@@ -111,6 +133,7 @@ export default function Navbar() {
         </div>
 
       </div>
+
 
       {/* Mobile Menu */}
 
@@ -126,6 +149,7 @@ export default function Navbar() {
             Dashboard
           </NavLink>
 
+
           <NavLink
             to="/AttendanceDetail"
             className="flex items-center gap-2 p-2 rounded hover:bg-gray-200"
@@ -133,6 +157,18 @@ export default function Navbar() {
             <FactCheckIcon fontSize="small"/>
             Attendance
           </NavLink>
+
+
+          {/* Predictor Mobile */}
+
+          <NavLink
+            to="/AttendancePredictor"
+            className="flex items-center gap-2 p-2 rounded hover:bg-gray-200"
+          >
+            <QueryStatsIcon fontSize="small"/>
+            Predictor
+          </NavLink>
+
 
           <button
             onClick={handleLogout}

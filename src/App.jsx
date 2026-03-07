@@ -5,6 +5,7 @@ import Signin from './Components/Authentication/Signin';
 import Home from './Components/Dashboard/Home';
 import AttendanceDetails from './Components/Dashboard/AttendanceDetails';
 import HomePage from './Components/Dashboard/HomePage';
+import AttendancePredictor from './Components/Dashboard/AttendancePredictor';
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path='/signin' element={<Signin/>} />
         <Route path='/' element= {<Home/>} />
         <Route path='/AttendanceDetail' element= {<AttendanceDetails/>} />
+        <Route path='/AttendancePredictor' element= {<AttendancePredictor/>} />
       </Routes>
 
     </BrowserRouter>

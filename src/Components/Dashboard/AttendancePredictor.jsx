@@ -68,10 +68,16 @@ export default function AttendancePredictor() {
 
   };
 
-  return (
+ return (
 
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 p-6">
- <Navbar/>
+  <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
+
+    {/* Navbar */}
+    <Navbar/>
+
+    {/* Main Content */}
+    <div className="flex-grow p-6">
+
       <div className="max-w-3xl mx-auto">
 
         {/* Title */}
@@ -80,6 +86,7 @@ export default function AttendancePredictor() {
           <QueryStatsIcon fontSize="large" />
           Attendance Predictor
         </h1>
+
 
         {/* Tabs */}
 
@@ -115,8 +122,6 @@ export default function AttendancePredictor() {
         {/* Tab Content */}
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
-
-          {/* Future Percentage */}
 
           {activeTab === "future" && (
 
@@ -157,8 +162,6 @@ export default function AttendancePredictor() {
 
           )}
 
-
-          {/* Target Percentage */}
 
           {activeTab === "target" && (
 
@@ -203,9 +206,12 @@ export default function AttendancePredictor() {
 
       </div>
 
-      <Footer/>
-
     </div>
 
-  );
+    {/* Footer */}
+    <Footer/>
+
+  </div>
+
+);
 }

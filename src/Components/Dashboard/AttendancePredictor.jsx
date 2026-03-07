@@ -24,7 +24,7 @@ export default function AttendancePredictor() {
          `${import.meta.env.VITE_API_BASE_URL}/api/attendance/percentageIfAttendNextDays`,
         {
           userId: localStorage.getItem("userId"),
-          days: Number(days)
+          nextDays: Number(days)
         }
       );
 
@@ -46,7 +46,7 @@ export default function AttendancePredictor() {
          `${import.meta.env.VITE_API_BASE_URL}/api/attendance/daysRequiredToReachXPercentage`,
         {
           userId:localStorage.getItem("userId"),
-          percentage: Number(percentage)
+          nextDays: Number(percentage)
         }
       );
 

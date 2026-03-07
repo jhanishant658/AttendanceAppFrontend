@@ -112,9 +112,11 @@ export default function HomePage() {
           </p>
 
         </div>
-      <Footer/>
+      
       </div>
 
+      {/* Footer */}
+      <Footer/>
     </div>
 
   );

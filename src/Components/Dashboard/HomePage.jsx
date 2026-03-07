@@ -5,6 +5,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 
 import Navbar from "./NavBar";
 import MarkAttendance from "./MarkAttendance";
+import Footer from "./Footer";
 
 export default function HomePage() {
 
@@ -111,7 +112,7 @@ export default function HomePage() {
           </p>
 
         </div>
-
+      <Footer/>
       </div>
 
     </div>

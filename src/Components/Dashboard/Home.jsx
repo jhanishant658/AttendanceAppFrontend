@@ -6,6 +6,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import SecurityIcon from "@mui/icons-material/Security";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import Footer from "./Footer";
 
 export default function Home() {
 
@@ -123,7 +124,7 @@ export default function Home() {
           </p>
 
         </div>
-
+        <Footer/>
       </div>
 
     </div>

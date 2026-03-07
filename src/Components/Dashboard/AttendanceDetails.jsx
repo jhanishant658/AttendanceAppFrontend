@@ -13,6 +13,7 @@ import PercentIcon from "@mui/icons-material/Percent";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 
 import Navbar from "./NavBar";
+import Footer from "./Footer";
 
 export default function AttendanceDetails() {
 
@@ -264,6 +265,7 @@ export default function AttendanceDetails() {
       )}
 
     </div>
+    <Footer/>
 </div>
 </div>
   );

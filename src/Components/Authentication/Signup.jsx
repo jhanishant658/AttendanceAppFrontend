@@ -8,9 +8,15 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-import { Link } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Signup() {
+
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -33,6 +39,8 @@ export default function Signup() {
 
     e.preventDefault();
 
+    setLoading(true);
+
     try {
 
       const response = await axios.post(
@@ -42,11 +50,19 @@ export default function Signup() {
 
       console.log(response.data);
 
+      setLoading(false);
+
       alert("Signup Successful");
+
+      navigate("/signin");
 
     } catch (error) {
 
+      setLoading(false);
+
       alert("Signup Failed");
+
+      console.log(error);
 
     }
 
@@ -54,9 +70,27 @@ export default function Signup() {
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 px-4">
 
-      <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-xl w-full max-w-md">
+      {/* Loading Overlay */}
+
+      {loading && (
+
+        <div className="fixed inset-0 bg-black/40 flex flex-col items-center justify-center z-50">
+
+          <CircularProgress size={50} className="text-white"/>
+
+          <p className="text-white mt-4 text-sm text-center">
+
+            Creating your account... please wait.
+
+          </p>
+
+        </div>
+
+      )}
+
+      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
 
         {/* Icon */}
 
@@ -64,7 +98,7 @@ export default function Signup() {
           <HowToRegIcon className="text-blue-600" style={{ fontSize: 42 }} />
         </div>
 
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
+        <h2 className="text-3xl font-bold text-center mb-6">
           Create Account
         </h2>
 
@@ -74,7 +108,7 @@ export default function Signup() {
 
           <div className="flex items-center border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
 
-            <PersonIcon className="text-gray-500 mr-2" />
+            <PersonIcon className="text-gray-500 mr-2"/>
 
             <input
               type="text"
@@ -82,18 +116,17 @@ export default function Signup() {
               placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full outline-none text-sm sm:text-base"
+              className="w-full outline-none"
               required
             />
 
           </div>
 
-
           {/* Email */}
 
           <div className="flex items-center border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
 
-            <EmailIcon className="text-gray-500 mr-2" />
+            <EmailIcon className="text-gray-500 mr-2"/>
 
             <input
               type="email"
@@ -101,18 +134,17 @@ export default function Signup() {
               placeholder="Email address"
               value={formData.email}
               onChange={handleChange}
-              className="w-full outline-none text-sm sm:text-base"
+              className="w-full outline-none"
               required
             />
 
           </div>
 
-
           {/* Password */}
 
           <div className="flex items-center border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
 
-            <LockIcon className="text-gray-500 mr-2" />
+            <LockIcon className="text-gray-500 mr-2"/>
 
             <input
               type={showPassword ? "text" : "password"}
@@ -120,26 +152,25 @@ export default function Signup() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full outline-none text-sm sm:text-base"
+              className="w-full outline-none"
               required
             />
 
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-gray-500"
             >
               {showPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
             </button>
 
           </div>
 
-
           {/* Signup Button */}
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition disabled:opacity-60"
           >
 
             <HowToRegIcon fontSize="small"/>
@@ -149,10 +180,9 @@ export default function Signup() {
 
         </form>
 
-
         {/* Login Redirect */}
 
-        <p className="text-center mt-5 text-sm">
+        <p className="text-center mt-6 text-sm">
 
           Already have an account?
 

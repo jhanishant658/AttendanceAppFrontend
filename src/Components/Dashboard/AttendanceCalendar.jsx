@@ -65,7 +65,9 @@ export default function AttendanceCalendar({ onAttendanceChange }) {
       setStats({ present, absent, holiday });
 
     } catch (error) {
+
       console.log("Monthly API error", error);
+
     }
 
   };
@@ -85,18 +87,15 @@ export default function AttendanceCalendar({ onAttendanceChange }) {
 
       alert(res.data);
 
-      setAttendance(prev => ({
-        ...prev,
-        [date]: status
-      }));
-
       fetchMonthlyAttendance();
       if(onAttendanceChange){
       onAttendanceChange();
     }
 
     } catch (error) {
+
       console.log(error);
+
     }
 
   };
@@ -116,17 +115,14 @@ export default function AttendanceCalendar({ onAttendanceChange }) {
 
       alert(res.data);
 
-      setAttendance(prev => ({
-        ...prev,
-        [date]: status
-      }));
-
       fetchMonthlyAttendance();
        if(onAttendanceChange){
       onAttendanceChange();
     }
     } catch (error) {
+
       console.log(error);
+
     }
 
   };
@@ -181,9 +177,13 @@ export default function AttendanceCalendar({ onAttendanceChange }) {
     if (!selectedDate) return;
 
     if (!attendance[selectedDate]) {
+
       MarkPastAttendance(selectedStatus, selectedDate);
+
     } else {
+
       updatePastAttendance(selectedStatus, selectedDate);
+
     }
 
     setSelectedDate(null);
@@ -200,7 +200,8 @@ export default function AttendanceCalendar({ onAttendanceChange }) {
 
     for (let i = 1; i <= daysInMonth; i++) {
 
-      const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+      const date =
+        `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
 
       const day = new Date(date).getDay();
       const isWeekend = day === 0 || day === 6;
@@ -248,7 +249,9 @@ export default function AttendanceCalendar({ onAttendanceChange }) {
   const daysHeader = ["S", "M", "T", "W", "T", "F", "S"];
 
   const total = stats.present + stats.absent;
-  const percentage = total === 0 ? 0 : ((stats.present / total) * 100).toFixed(1);
+
+  const percentage =
+    total === 0 ? 0 : ((stats.present / total) * 100).toFixed(1);
 
   return (
 
@@ -308,6 +311,40 @@ export default function AttendanceCalendar({ onAttendanceChange }) {
       <div className="grid grid-cols-7 gap-2 mb-4">
         {renderDays()}
       </div>
+
+      {/* Click Form */}
+
+      {selectedDate && (
+
+        <div className="border rounded p-3 mt-3">
+
+          <p className="text-sm mb-2">Date: {selectedDate}</p>
+
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="border p-2 rounded w-full"
+          >
+
+            <option value="">Select Status</option>
+            <option value="present">Present</option>
+            <option value="absent">Absent</option>
+            <option value="holiday">Holiday</option>
+
+          </select>
+
+          <button
+            onClick={handleSubmit}
+            className="mt-2 bg-blue-600 text-white w-full py-1 rounded"
+          >
+
+            Submit
+
+          </button>
+
+        </div>
+
+      )}
 
     </div>
 
